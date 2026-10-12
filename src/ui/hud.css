@@ -1,0 +1,204 @@
+/* HUD overlay (SPEC 8.1). The HUD is laid out once in the pixels of the 608 px wide reference frame (--u = 1 px) and
+   hud.ts scales the whole block with a transform to the width of the game frame. Laying out at a fixed size keeps
+   every glyph on the same baseline at any viewport width (browsers snap text baselines to whole pixels). */
+
+@font-face {
+  font-family: 'Lilita One'; /* SIL OFL 1.1, see fonts/LilitaOne-OFL.txt */
+  src: url('./fonts/LilitaOne-Regular.woff2') format('woff2');
+  font-weight: 100 900; /* one face for every weight: no synthetic bold */
+  font-style: normal;
+  font-display: swap;
+}
+
+.pc-hud {
+  --u: 1px;
+  --ink: #0e1013;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 608px;
+  height: 96px;
+  transform-origin: 0 0;
+  z-index: 4;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  color: #fbffff;
+  font-family: 'Lilita One', 'Arial Rounded MT Bold', 'Hiragino Maru Gothic ProN', 'Nunito', 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 900;
+  font-size: calc(var(--u) * 21);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+.pc-hud *,
+.pc-hud *::before {
+  box-sizing: border-box;
+}
+.pc-hud canvas {
+  display: block;
+  flex: none;
+}
+
+/* dark top bar; its fill runs far past both ends of the block, so in a frame wider than the HUD (wide mode) the bar
+   still spans the frame (the frame clips it) */
+.pc-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: calc(var(--u) * 40);
+}
+.pc-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(var(--u) * -4000);
+  background: rgba(39, 47, 52, 0.9);
+  box-shadow: 0 calc(var(--u) * 1) 0 rgba(0, 0, 0, 0.25);
+}
+.pc-cell {
+  position: absolute;
+  top: 0;
+  height: calc(var(--u) * 40);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 4);
+}
+.pc-cell canvas {
+  width: calc(var(--u) * 30);
+  height: calc(var(--u) * 30);
+  filter: drop-shadow(0 calc(var(--u) * 1) 0 rgba(0, 0, 0, 0.45));
+}
+/* icon centres at x = 118, 254 (6 px right of the ad: cell 1 has to fit "180/180"), 375 and 511 */
+.pc-c1 { left: calc(var(--u) * 103); }
+.pc-c2 { left: calc(var(--u) * 239); }
+.pc-c3 { left: calc(var(--u) * 360); }
+.pc-coin {
+  left: calc(var(--u) * 497.5);
+  gap: calc(var(--u) * 1);
+}
+.pc-coin canvas {
+  width: calc(var(--u) * 27);
+  height: calc(var(--u) * 27);
+}
+.pc-div {
+  position: absolute;
+  top: calc(var(--u) * 8);
+  width: calc(var(--u) * 1.5);
+  height: calc(var(--u) * 24);
+  background: #555557;
+  border-radius: calc(var(--u) * 1);
+}
+
+/* numbers: one <b> per character; digits sit in fixed cells so values never jiggle. The dark outline and the drop
+   shadow are ::before copies painted behind ALL fills of the same number (isolation + z-index -1). */
+.pc-num {
+  --k: 1; /* shrink factor for long values */
+  --sx: 0.88; /* horizontal squeeze: the ad's face is a little narrower than Lilita One */
+  position: relative;
+  display: inline-flex;
+  isolation: isolate;
+  white-space: nowrap;
+  font-size: calc(var(--u) * 21 * var(--k));
+  transform: scaleX(var(--sx));
+  transform-origin: left center;
+}
+.pc-num b {
+  position: relative;
+  display: inline-block;
+  font-weight: inherit;
+  text-align: center;
+  -webkit-text-stroke: 0.035em currentColor; /* a touch heavier, like the ad's face */
+}
+.pc-num b.d {
+  width: 0.62em;
+}
+.pc-num b::before {
+  content: attr(data-c);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: -1;
+  color: var(--ink);
+  -webkit-text-stroke: 0.17em var(--ink);
+  text-shadow: 0 0.075em 0 rgba(0, 0, 0, 0.55);
+}
+.pc-coin .pc-num {
+  --sx: 0.86; /* the ad's coin digits are narrow glyphs set wide apart */
+  font-size: calc(var(--u) * 31 * var(--k));
+}
+.pc-coin .pc-num b.d {
+  width: 0.8em; /* x 0.86 = a 21 px pitch at the reference size, wide-spaced like the ad */
+}
+.pc-coin .pc-num b::before {
+  -webkit-text-stroke-width: 0.14em;
+}
+
+/* portrait tile with the level number on its lower-right corner */
+.pc-portrait {
+  position: absolute;
+  left: calc(var(--u) * 3);
+  top: calc(var(--u) * 3);
+  width: calc(var(--u) * 80);
+  height: calc(var(--u) * 80);
+  border-radius: calc(var(--u) * 9);
+  border: calc(var(--u) * 3) solid #c1c9dd;
+  background: #4b60a4;
+  overflow: hidden;
+  box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 3) rgba(0, 0, 0, 0.45);
+}
+.pc-portrait canvas {
+  width: 100%;
+  height: 100%;
+}
+.pc-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--u) * 6);
+  box-shadow: inset 0 0 0 calc(var(--u) * 1.5) #7d86a9, inset 0 calc(var(--u) * -6) calc(var(--u) * 8) rgba(20, 28, 70, 0.35);
+}
+.pc-level {
+  position: absolute;
+  left: calc(var(--u) * 54);
+  top: calc(var(--u) * 55);
+  width: calc(var(--u) * 40);
+  height: calc(var(--u) * 34);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pc-level .pc-num {
+  --sx: 1;
+  font-size: calc(var(--u) * 34 * var(--k));
+  transform-origin: center;
+}
+.pc-level .pc-num b.d {
+  width: 0.56em;
+}
+.pc-level .pc-num b::before {
+  -webkit-text-stroke-width: 0.15em;
+}
+
+/* "power" pill: total gold earned */
+.pc-pill {
+  position: absolute;
+  left: calc(var(--u) * 88);
+  top: calc(var(--u) * 45);
+  min-width: calc(var(--u) * 180);
+  height: calc(var(--u) * 35);
+  padding: 0 calc(var(--u) * 14) 0 calc(var(--u) * 15);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 7);
+  border-radius: calc(var(--u) * 6);
+  background: rgba(35, 39, 42, 0.86);
+  box-shadow: inset 0 0 0 calc(var(--u) * 1) rgba(255, 255, 255, 0.05);
+}
+.pc-pill canvas {
+  width: calc(var(--u) * 31);
+  height: calc(var(--u) * 31);
+  filter: drop-shadow(0 calc(var(--u) * 1) 0 rgba(0, 0, 0, 0.45));
+}

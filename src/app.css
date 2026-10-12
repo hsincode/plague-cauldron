@@ -1,0 +1,20 @@
+html, body { margin: 0; height: 100%; background: #05090d; overflow: hidden; overscroll-behavior: none; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+#app { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+/* 9:16 from CSS alone, so the title card is on screen before (and without) the script; main.ts then sets the size */
+#frame { position: relative; overflow: hidden; background: #0d1720; touch-action: none; height: 100%; height: 100dvh; aspect-ratio: 9 / 16; max-width: 100vw; }
+#c { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.joy { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 2px solid rgba(255,255,255,.22); background: rgba(255,255,255,.04); opacity: 0; transition: opacity .12s; pointer-events: none; z-index: 5; }
+.joy.on { opacity: 1; }
+.joy i { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.28); transform: translate(-50%,-50%); }
+.overlay { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(13,23,32,.55), rgba(13,23,32,.92)); color: #fbf3f5; text-align: center; font-family: "Lilita One", "Hiragino Maru Gothic ProN", "Rounded Mplus 1c", "Noto Sans JP", system-ui, sans-serif; transition: opacity .35s; }
+.overlay[hidden] { display: none; }
+.overlay.out { opacity: 0; pointer-events: none; }
+.title-card h1 { margin: 0; font-size: clamp(34px, 11cqw, 76px); line-height: .95; letter-spacing: .04em; color: #f4c671; text-shadow: 0 3px 0 #5d371c, 0 0 28px rgba(244,198,113,.35); }
+.title-card .sub { margin: 14px 0 26px; font-size: clamp(14px, 3.6cqw, 22px); letter-spacing: .3em; color: #aaf3f7; }
+.title-card .help { margin-top: 22px; font-size: clamp(11px, 2.8cqw, 15px); line-height: 1.7; color: #b9c2cc; font-family: system-ui, sans-serif; }
+.overlay button { font: inherit; font-size: clamp(18px, 5cqw, 28px); padding: .5em 1.6em; border: 0; border-radius: 999px; color: #10261a; background: linear-gradient(#92fe5b, #24ee34); box-shadow: 0 4px 0 #0f7a1c, 0 8px 22px rgba(36,238,52,.3); cursor: pointer; }
+.overlay button:active { transform: translateY(3px); box-shadow: 0 1px 0 #0f7a1c; }
+.overlay button:disabled { filter: grayscale(.7); opacity: .55; pointer-events: none; }
+#frame { container-type: inline-size; }
+#mute { position: absolute; right: 8px; bottom: 8px; z-index: 21; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(39,47,52,.7); color: #fbf3f5; font-size: 16px; cursor: pointer; opacity: .7; }
+#mute.off { opacity: .35; text-decoration: line-through; }
